@@ -9,20 +9,26 @@ import { PrimaryButton } from './components/primaryButton'
 import * as yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { parsePhoneNumberFromString } from "libphonenumber-js"
+import { useData } from "./DataContext";
 
 const schema = yup.object().shape({
     email:yup.string().email("Email should have correct format").required("Email is a required field")
 })
 
 export const Step2 = () => {
+    
+    const [checked, setChecked] = React.useState(true);
     const history = useHistory()
-
-    const {register, handleSubmit,watch, formState: { errors }} = useForm({
+    const {data,setValues} = useData() 
+    
+        const {register, handleSubmit,watch, formState: { errors }} = useForm({
+        defaultValues:{ email:data.email,hasPhone:checked,phoneNumber:data.phoneNumber},
         mode:"onBlur",
         resolver:yupResolver(schema)
-    })
+        })
+    
+   
 
-    const [checked, setChecked] = React.useState(true);
     const normalizePhoneNumber = (value) =>{
     
         const phoneNumber = parsePhoneNumberFromString(value)
@@ -32,8 +38,8 @@ export const Step2 = () => {
     }
 
     const onSubmit = (data) => {
-        history.push("/step3")
-        //console.log(data)
+        history.push("./step3")
+        setValues(data)
     }
 
     return (
@@ -69,7 +75,8 @@ export const Step2 = () => {
                     
                     }
                  <FormControlLabel control = {
-                    <Checkbox {...register('hasPhone')}  onChange={() => {setChecked(!checked)
+                    <Checkbox {...register('hasPhone')} defaultValue={!checked}
+                    defaultChecked = {!checked} onChange={() => {setChecked(!checked)
                         
                     }} color = "primary" />
                 }  
@@ -80,5 +87,5 @@ export const Step2 = () => {
         </MainContainer>
         
     )
-    
+          
 }
